@@ -15,6 +15,8 @@ func newRouter() *mux.Router {
 	router.PathPrefix("/assets/").Handler(staticFileHandler).Methods("GET")
 
 	router.HandleFunc("/welcome", handler).Methods("GET")
+	router.HandleFunc("/bird", getBirdHandler).Methods("GET")
+	router.HandleFunc("/bird", createBirdHandler).Methods("POST")
 
 	return router
 }
