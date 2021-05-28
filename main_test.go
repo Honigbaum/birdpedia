@@ -9,17 +9,15 @@ import (
 
 func TestHandler(t *testing.T) {
 	router := newRouter()
-
 	mockServer := httptest.NewServer(router)
 
 	res, err := http.Get(mockServer.URL + "/welcome")
-
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	if res.StatusCode != http.StatusOK {
-		t.Errorf("handler returned wrong status code: got %v want %v", res.StatusCode, http.StatusOK)
+		t.Errorf("status code should be 200, got %d", res.StatusCode)
 	}
 
 	checkReponseBody(res, t, "Welcome to Birdpedia!")
@@ -27,11 +25,9 @@ func TestHandler(t *testing.T) {
 
 func TestRouterForNonExistingRoute(t *testing.T) {
 	router := newRouter()
-
 	mockServer := httptest.NewServer(router)
 
 	res, err := http.Post(mockServer.URL+"/welcome", "", nil)
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -41,6 +37,27 @@ func TestRouterForNonExistingRoute(t *testing.T) {
 	}
 
 	checkReponseBody(res, t, "")
+}
+
+func TestStaticFileServer(t *testing.T) {
+	router := newRouter()
+	mockServer := httptest.NewServer(router)
+
+	res, err := http.Get(mockServer.URL + "/assets/")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if res.StatusCode != http.StatusOK {
+		t.Errorf("status code should be 200, got %d", res.StatusCode)
+	}
+
+	contentType := res.Header.Get("Content-Type")
+	expectedContentType := "text/html; charset=utf-8"
+
+	if expectedContentType != contentType {
+		t.Errorf("Wrong content type, expected %s, got %s", expectedContentType, contentType)
+	}
 }
 
 func checkReponseBody(res *http.Response, t *testing.T, expected string) {
